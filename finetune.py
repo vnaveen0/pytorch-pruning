@@ -146,7 +146,7 @@ class PrunningFineTuner_VGG16:
             correct += pred.cpu().eq(label).sum()
             total += label.size(0)
 
-        print "Accuracy :", float(correct) / total
+        print ("Accuracy :", float(correct) / total)
 
         self.model.train()
 
@@ -157,10 +157,10 @@ class PrunningFineTuner_VGG16:
                     lr=0.0001, momentum=0.9)
 
         for i in range(epoches):
-            print "Epoch: ", i
+            print ("Epoch: ", i)
             self.train_epoch(optimizer)
             self.test()
-        print "Finished fine tuning."
+        print ("Finished fine tuning.")
 
 
     def train_batch(self, optimizer, batch, label, rank_filters):
@@ -210,10 +210,10 @@ class PrunningFineTuner_VGG16:
 
         iterations = int(iterations * 2.0 / 3)
 
-        print "Number of prunning iterations to reduce 67% filters", iterations
+        print ("Number of prunning iterations to reduce 67% filters", iterations)
 
         for _ in range(iterations):
-            print "Ranking filters.. "
+            print ("Ranking filters.. ")
             prune_targets = self.get_candidates_to_prune(num_filters_to_prune_per_iteration)
             layers_prunned = {}
             for layer_index, filter_index in prune_targets:
@@ -221,8 +221,8 @@ class PrunningFineTuner_VGG16:
                     layers_prunned[layer_index] = 0
                 layers_prunned[layer_index] = layers_prunned[layer_index] + 1
 
-            print "Layers that will be prunned", layers_prunned
-            print "Prunning filters.. "
+            print ("Layers that will be prunned", layers_prunned)
+            print ("Prunning filters.. ")
             model = self.model.cpu()
             for layer_index, filter_index in prune_targets:
                 model = prune_vgg16_conv_layer(model, layer_index, filter_index)
@@ -230,14 +230,14 @@ class PrunningFineTuner_VGG16:
             self.model = model
 
             message = str(100*float(self.total_num_filters()) / number_of_filters) + "%"
-            print "Filters prunned", str(message)
+            print ("Filters prunned", str(message))
             self.test()
-            print "Fine tuning to recover from prunning iteration."
+            print ("Fine tuning to recover from prunning iteration.")
             optimizer = optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
             self.train(optimizer, epoches = 10)
 
 
-        print "Finished. Going to fine tune the model a bit more"
+        print ("Finished. Going to fine tune the model a bit more")
         self.train(optimizer, epoches = 15)
         torch.save(model, "model_prunned")
 

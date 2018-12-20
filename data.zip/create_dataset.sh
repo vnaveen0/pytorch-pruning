@@ -1,10 +1,10 @@
 #!/bin/bash
-# unzip train.zip
+unzip train.zip
 cd train
-# mkdir -p ../cat ../dog
-# mv cat* ../cat
-# mv dog* ../dog
-# mv ../cat ../dog .
+mkdir -p ../cat ../dog
+mv cat* ../cat
+mv dog* ../dog
+mv ../cat ../dog .
 mkdir -p ../test/cat  ../test/dog
 
 for n in {2000..3000}; do
